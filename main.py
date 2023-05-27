@@ -9,7 +9,9 @@ class Thing:
     type = ""
 
 
-def OH2_KNX_lightThingConfigToOH3_KNX_ChannelConfig(configFile):
+def OH2_KNX_lightThingConfigParser(configFile):
+    # input: OpenHab2 KNX config file
+    # output: list of Things represented as internal Objects
     thingList = []
 
     with open(configFile, 'r') as file:
@@ -87,10 +89,38 @@ def formatChannelConfiguration(thing):
         return "\"upDown\": \"" + thing.address + "\""
 
 
-# Press the green button in the gutter to run the script.
+# homebridge converter
+
+def thingObjectListToHomebridgeConfigFile(thingsList):
+    with open("Homebridge_output.txt", "a") as output:
+        for thing in thingsList:
+            if thing.type == "Rollershutter":
+                output.write(
+                    "{\n    "
+                    + "\"name\": \"" + thing.label + "\",\n" +
+                    "    \"type\": " + "\"windowcovering\"" + ",\n" +
+                    "    \"item\": \"" + thing.id + "\",\n" +
+                    "    \"inverted\": \"true\"\n},\n"
+                )
+            elif thing.type == "Switch":
+                output.write(
+                    "{\n    "
+                    + "\"name\": \"" + thing.label + "\",\n" +
+                    "    \"type\": \"light\",\n" +
+                    "    \"item\": \"" + thing.id + "\"\n},\n"
+                )
+
+
+
+
+
+            # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    thingsList = OH2_KNX_lightThingConfigToOH3_KNX_ChannelConfig('EIB.txt')
-    for thing in thingsList:
+    thingsList = OH2_KNX_lightThingConfigParser('EIB.txt')
+    #for thing in thingsList:
     #    print("Type: " + thing.type + ", id: " + thing.id + ", Label: " + thing.label + ", address: " + thing.address)
-        if thing.type == "Switch" or thing.type == "Rollershutter":
-            thingObjectToOH3Thing(thing)
+    #    if thing.type == "Switch" or thing.type == "Rollershutter":
+    #        thingObjectToOH3Thing(thing)
+    thingObjectListToHomebridgeConfigFile(thingsList)
+
+
